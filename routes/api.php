@@ -26,6 +26,10 @@ Route::get('client', [\App\Http\Controllers\ApiController::class, 'getClient']);
 Route::put('client', [\App\Http\Controllers\ApiController::class, 'updateClient']);
 Route::post('confirm_phone', [\App\Http\Controllers\ApiController::class, 'confirmPhone']);
 Route::post('reset_password', [\App\Http\Controllers\ApiController::class, 'resetPassword']);
-Route::get('trainers', [\App\Http\Controllers\ApiController::class, 'getTrainersAll']);
+/*
+ * TODO: Доделать получение всех тренеров
+ */
+//Route::get('trainers', [\App\Http\Controllers\ApiController::class, 'getTrainersAll']);
+Route::get('promocode/check', [\App\Http\Controllers\ApiController::class, 'getPromocodeCheck']);
 
 

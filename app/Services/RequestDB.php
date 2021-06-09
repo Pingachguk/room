@@ -103,6 +103,22 @@ class RequestDB
         return $response->json();
     }
 
+    public static function deleteTraining($clubId, $utoken, $appointmentId)
+    {
+        $apikey = Clubs::getKeyByClub($clubId);
+        $response = Http::withBasicAuth(env('APP_BASIC_LOGIN'), env('APP_BASIC_PASSWORD'))
+            ->withHeaders([
+                'apikey' => $apikey,
+                'usertoken' => $utoken
+            ])
+            ->delete(env('API_ADDR') . '/appointment/', [
+                'club_id' => $clubId,
+                'appointment_id' => $appointmentId
+            ]);
+
+        return $response->json();
+    }
+
     public static function getTrainers($clubId, $utoken)
     {
         $apikey = Clubs::getKeyByClub($clubId);
@@ -110,7 +126,7 @@ class RequestDB
         $response = Http::withBasicAuth(env('APP_BASIC_LOGIN'), env('APP_BASIC_PASSWORD'))
             ->withHeaders([
                 'apikey' => $apikey,
-                'utoken' => $utoken
+                'usertoken' => $utoken
             ])
             ->get(env('API_ADDR') . '/appointment_trainers/', [
                 "club_id" => $clubId
@@ -126,10 +142,45 @@ class RequestDB
         $response = Http::withBasicAuth(env('APP_BASIC_LOGIN'), env('APP_BASIC_PASSWORD'))
             ->withHeaders([
                 'apikey' => $apikey,
-                'utoken' => $utoken
+                'usertoken' => $utoken
             ])
             ->get(env('API_ADDR') . '/appointment_services/', [
                 "club_id" => $clubId
+            ]);
+
+        return $response->json();
+    }
+
+    public static function getTimesOfService($clubId, $utoken, $employeeId, $serviceId)
+    {
+        $apikey = Clubs::getKeyByClub($clubId);
+
+        $response = Http::withBasicAuth(env('APP_BASIC_LOGIN'), env('APP_BASIC_PASSWORD'))
+            ->withHeaders([
+                'apikey' => $apikey,
+                'usertoken' => $utoken
+            ])
+            ->get(env('API_ADDR') . '/appointment_services/', [
+                "club_id" => $clubId,
+                "employee_id" => $employeeId,
+                "service_id" => $serviceId
+            ]);
+
+        return $response->json();
+    }
+
+    public static function getPromocodeCheck($clubId, $utoken, $queryParam, $data)
+    {
+        $apikey = Clubs::getKeyByClub($clubId);
+
+        $response = Http::withBasicAuth(env('APP_BASIC_LOGIN'), env('APP_BASIC_PASSWORD'))
+            ->withHeaders([
+                'apikey' => $apikey,
+                'usertoken' => $utoken
+            ])
+            ->get(env('API_ADDR') . '/cart_cost/?cart='.$queryParam, [
+                "club_id" => $clubId,
+                "promocode" => $data['promocode']
             ]);
 
         return $response->json();

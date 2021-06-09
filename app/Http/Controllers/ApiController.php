@@ -124,17 +124,17 @@ class ApiController extends Controller
 //@app.post("/api/verified/send", name='Заявка на верефикацию паспорта')
 //async def verified_send(item: ModelVerifiedSend):
 
-//@app.get("/api/training/cancel")
-//def get_training_cancel(club_id: Optional[str] = Query(...), appointment_id: Optional[str] = Query(...), utoken: str = Header(...)):
+
     public function getTrainingCancel(Request $request)
     {
         $club_id = $request->header("club_id");
         $utoken = $request->cookie("utoken");
 
+        $response = RequestDB::deleteTraining($club_id, $utoken, $request->input('appointment_id'));
+
+        return $response;
     }
 
-//@app.get("/api/trainers/detail")
-//def get_trainer_detail(club_id: Optional[str] = Query(...), employee_id: Optional[str] = Query(...), utoken: str = Header(...)):
     public function getTrainerDetail(Request $request)
     {
         $club_id = $request->header("club_id");
@@ -151,16 +151,28 @@ class ApiController extends Controller
         $data = $request->input();
 
         $trainers = Trainer::getAllTrainers($clubId, $utoken);
-        $services = Trainer::getServices($clubId, $utoken);
 
         return response($trainers);
     }
 
-//@app.get("/api/promocode/check", name="Стоимость корзины + промокод")
-//def get_promocode_check(club_id: Optional[str] = Query(...),
+
     public function getPromocodeCheck(Request $request)
     {
+        $clubId = $request->header('club_id');
+        $utoken = $request->cookie('utoken');
+        $data = $request->input();
 
+        $cartObj = [
+            "cart_array" => [
+                [
+                    "purchase_id" => $data["product_id"],
+                    "count" => 1
+                ]
+            ]
+        ];
+
+        $response = RequestDB::getPromocodeCheck($clubId, $utoken, json_encode($cartObj), $data);
+        return $response;
     }
 
 //@app.get("/api/shop/products", name="Абонементы / каталог товаров")
