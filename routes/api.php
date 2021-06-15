@@ -31,5 +31,6 @@ Route::post('reset_password', [\App\Http\Controllers\ApiController::class, 'rese
  */
 //Route::get('trainers', [\App\Http\Controllers\ApiController::class, 'getTrainersAll']);
 Route::get('promocode/check', [\App\Http\Controllers\ApiController::class, 'getPromocodeCheck']);
-
+Route::get('shop/products', [\App\Http\Controllers\ApiController::class, 'getShopProducts']);
+Route::post('subscription/write', [\App\Http\Controllers\ApiController::class, 'subscriptionsWrite']);
 

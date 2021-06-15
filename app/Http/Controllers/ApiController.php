@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 use App\Services\Clubs;
 use App\Services\Client;
 use App\Services\RequestDB;
+use App\Services\Shop;
 
 class ApiController extends Controller
 {
@@ -175,11 +176,77 @@ class ApiController extends Controller
         return $response;
     }
 
-//@app.get("/api/shop/products", name="Абонементы / каталог товаров")
-//def get_shop_products(club_id: Optional[str] = Query(...), utoken: str = Header(...)):
 
-//@app.post("/api/subscription/write", name="Запись на тренеровку с абонемента")
-//def subscriptions_write(item: ModelSubscriptionWrite, utoken: str = Header(...)):
+    public function getShopProducts(Request $request)
+    {
+        $clubId = $request->header('club_id');
+        $utoken = $request->cookie('usertoken');
+
+        $products = RequestDB::getProductsShop($clubId, $utoken);
+
+        $subscriptions = [
+            'first' => [
+                'trainer' => []
+            ],
+            'once' => [
+                'office' => [],
+                'trainer' => []
+            ],
+            'package' => [
+                'office' => [],
+                'trainer' => []
+            ]
+        ];
+
+        $isVerified = false;
+        if ($products['result']) {
+            $data = $products['data'];
+            foreach ($data as $item) {
+                $category = Shop::getCategory($item);
+                if ($category) {
+                    $typeCategory = array_keys($category)[0];
+
+                    if ($category[$typeCategory] == 'office') {
+                        $isVerified = true;
+                    }
+
+                    if ($typeCategory != 'first') {
+                        $subscriptions[$typeCategory][$category[$typeCategory]] = $item;
+                    }
+                }
+            }
+        }
+        $subscriptions['is_verified'] = $isVerified;
+        return response($subscriptions);
+    }
+
+
+    public function subscriptionsWrite(Request $request)
+    {
+        $utoken = $request->cookie('usertoken');
+        $clubId = $request->header('club_id');
+        $employeeId = $request->input('employee_id');
+        $date = $request->input('date');
+        $time = $request->input('time');
+
+        $response = RequestDB::getServicesTrainer($clubId, $utoken, $employeeId);
+
+        if ($response['result']) {
+            if ($response['data']) {
+                $serviceId = $response['data'][0]['id'];
+                $writeObject = [
+                    'club_id' => $clubId,
+                    'employee_id' => $employeeId,
+                    'service_id' => $serviceId,
+                    'date_time' => $date . ' ' . $time
+                ];
+
+                $responseWrite = RequestDB::postWriting($clubId, $utoken, $writeObject);
+                return $responseWrite;
+            }
+        }
+
+    }
 
 //@app.post("/api/subscription/product/reserved", name="Оплата забронированной тренеровки")
 //def subscriptions_write(item: ModelSubscriptionWrite, utoken: str = Header(...)):
